@@ -23,7 +23,7 @@ function RESTART_CONTAINER() {
 
 
 function UPDATE_CODE() {
-    host=`echo $APP_SERVICES | cut -d "@" -f 1`
+    host=`echo $CELERY_SERVICES | cut -d "@" -f 1`
     echo $host
     echo "Get requirements from $SSH_USER@$host:$SRC_DIRECTORY"
     scp $SSH_USER@$host:$SRC_DIRECTORY/requirements.txt ./requirements_remote.txt
