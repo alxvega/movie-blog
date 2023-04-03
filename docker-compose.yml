@@ -13,7 +13,7 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog.celery_config worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip --purge
+    command: celery -A movies_blog worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip --purge
 
     volumes:
       - .:/app
@@ -22,14 +22,21 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery flower -A movies_blog -purge_offline_workers=180 --broker=${CELERY_BROKER_URL}
+    command: celery -A movies_blog flower --max_tasks=100000 --purge_offline_workers=180
     volumes:
       - .:/app
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
-
+  beat:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A movies_blog beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/app
+      
   postgres_db:
     image: postgres:13
     command: postgres -B 160MB -N 800
