@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+  worker_green:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A settings.celery_config worker -Q green -P gevent -c 100 -l info -E -n green@%h --purge
+    volumes:
+      - .:/app
+  worker_database:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A settings.celery_config worker -Q database -P gevent -c 50 -l info -E -n database@%h --purge
+    volumes:
+      - .:/app
+  flower:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery flower -A settings.celery_config --max_tasks=1000000 --persistent=True --db=/tmp/flower.db --purge_offline_workers=180 --broker=${CELERY_BROKER_URL}
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+    ports:
+      - "5555:5555"
+
