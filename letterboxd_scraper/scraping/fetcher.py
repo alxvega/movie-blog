@@ -67,5 +67,5 @@ class MoviesFetcher(LetterboxdFetcher):
         total_movies = int("".join(filter(lambda x: str.isdigit(x), total_movies)))
         movies_per_page = len([node for node in tree.css('li[class="listitem poster-container"]')])
         pagination = total_movies / movies_per_page
-        pagination = pagination if pagination % 1 == 0 else int(pagination + 1)
+        pagination = int(pagination if pagination % 1 == 0 else int(pagination + 1))
         return pagination
