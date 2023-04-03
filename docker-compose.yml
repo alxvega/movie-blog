@@ -1,24 +1,28 @@
 version: '3.3'
+
 services:
   worker_green:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A settings.celery_config worker -Q green -P gevent -c 100 -l info -E -n green@%h --purge
+    command: celery -A movies_blog worker -Q green -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip --purge
     volumes:
       - .:/app
+
   worker_database:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A settings.celery_config worker -Q database -P gevent -c 50 -l info -E -n database@%h --purge
+    command: celery -A movies_blog.celery_config worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip --purge
+
     volumes:
       - .:/app
+
   flower:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery flower -A settings.celery_config --max_tasks=1000000 --persistent=True --db=/tmp/flower.db --purge_offline_workers=180 --broker=${CELERY_BROKER_URL}
+    command: celery flower -A movies_blog -purge_offline_workers=180 --broker=${CELERY_BROKER_URL}
     volumes:
       - .:/app
     environment:
@@ -26,3 +30,28 @@ services:
     ports:
       - "5555:5555"
 
+  postgres_db:
+    image: postgres:13
+    command: postgres -B 160MB -N 800
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DEFAULT_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DEFAULT_POSTGRES_PASSWORD}
+    env_file: .env
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
