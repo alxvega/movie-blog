@@ -1,8 +1,8 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from persistance import retrieve_movie_slugs
-from scraping.parser import ReviewsParser, MoviesParser, StatsParser, ImageParser
-from scraping.fetcher import (
+from .persistance import retrieve_movie_slugs
+from .scraping.parser import ReviewsParser, MoviesParser, StatsParser, ImageParser
+from .scraping.fetcher import (
     MoviesFetcher,
     PopularReviewsFetcher,
     RecentReviewsFetcher,
@@ -10,7 +10,7 @@ from scraping.fetcher import (
     StatsFetcher,
 )
 
-from models import (
+from .models import (
     MovieModel,
     ImageModel,
     PopularReviewModel,
@@ -75,6 +75,7 @@ def scrape_movie_page(self, page):
     fetcher = MoviesFetcher()
     response = fetcher.request(page)
     movies = MoviesParser().parse(response)
+    print(f'Scraped {page}')
     return movies
 
 

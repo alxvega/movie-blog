@@ -134,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Argentina/Buenos_Aires"
 
 USE_I18N = True
 
@@ -161,10 +161,12 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_MAX_LOOP_INTERVAL = 20
 CELERY_BROKER_POOL_LIMIT = 100
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='django-db')
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
 
 # Default Tasks Mapping
 mapping_tasks = [
-    ('letterboxd.tasks.*', {'queue': 'green'}),
+    ('letterboxd_scraper.tasks.*', {'queue': 'green'}),
 ]
 
 mapping_tasks.insert(0, ('*.tasks.save_*', {'queue': 'database'}))
