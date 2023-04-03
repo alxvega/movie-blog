@@ -31,9 +31,7 @@ DEBUG = env.bool('DJANGO_DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = [
-    '0.0.0.0:8000',
-]
+CSRF_TRUSTED_ORIGINS = ['http://0.0.0.0:8000']
 
 
 # Application definition
@@ -50,9 +48,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'django_celery_beat',
     'django_celery_results',
+    'django_extensions',
     'django_json_widget',
-    'rangefilter',
     'import_export',
+    'rangefilter',
 ] + LOCAL_APPS
 
 MIDDLEWARE = [

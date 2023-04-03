@@ -1,9 +1,8 @@
-import os
-from dotenv import load_dotenv
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from sqlalchemy.orm import sessionmaker
-from letterboxd.fetcher import (
+from persistance import retrieve_movie_slugs
+from scraping.parser import ReviewsParser, MoviesParser, StatsParser, ImageParser
+from scraping.fetcher import (
     MoviesFetcher,
     PopularReviewsFetcher,
     RecentReviewsFetcher,
@@ -11,11 +10,7 @@ from letterboxd.fetcher import (
     StatsFetcher,
 )
 
-from letterboxd.parsing import ReviewsParser, MoviesParser, StatsParser, ImageParser
-
-from letterboxd.persistance import retrieve_movie_slugs
-from letterboxd.models import (
-    get_engine,
+from models import (
     MovieModel,
     ImageModel,
     PopularReviewModel,
@@ -25,17 +20,9 @@ from letterboxd.models import (
 
 
 logger = get_task_logger(__name__)
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
-engine = get_engine(
-    user=os.getenv("DEFAULT_POSTGRES_USER"),
-    password=os.getenv("DEFAULT_POSTGRES_PASSWORD"),
-    host=os.getenv("DEFAULT_POSTGRES_SERVER"),
-    port=os.getenv("DEFAULT_POSTGRES_PORT"),
-    db=os.getenv("DEFAULT_POSTGRES_DB"),
-)
-Session = sessionmaker(bind=engine)
 
 
+# Triggers
 @shared_task()
 def kickoff_initial_movies_data():
     fetcher = MoviesFetcher()
@@ -46,27 +33,14 @@ def kickoff_initial_movies_data():
         step.apply_async()
 
 
-@shared_task(
-    bind=True,
-    # autoretry_for=(RequestError,),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 5},
-)
-def scrape_movie_page(self, page):
-    fetcher = MoviesFetcher()
-    response = fetcher.request(page)
-    movies = MoviesParser().parse(response)
-    return movies
-
-
 @shared_task
-def save_movies(movies):
-    session = Session()
+def kickoff_scrape_stats():
+    movies = retrieve_movie_slugs()
     for movie in movies:
-        movie_record = MovieModel(**movie)
-        session.add(movie_record)
-    session.commit()
-    session.close()
+        movie_slug = movie[0]
+        step = scrape_movie_stats.s(movie_slug, id=movie[1])
+        step.link(save_stats.s())
+        step.apply_async()
 
 
 @shared_task
@@ -77,28 +51,6 @@ def kickoff_scrape_images():
         step = scrape_movie_image.s(movie_slug, id=movie[1])
         step.link(save_images.s())
         step.apply_async()
-
-
-@shared_task(
-    bind=True,
-    # autoretry_for=(RequestError, ),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 4},
-)
-def scrape_movie_image(self, movie_slug, **kwargs):
-    response = ImageFetcher().request(movie_slug[0])
-    images = ImageParser().parse(response)
-    images.update(**kwargs)
-    return images
-
-
-@shared_task
-def save_images(movie):
-    session = Session()
-    movie_record = ImageModel(**movie)
-    session.add(movie_record)
-    session.commit()
-    session.close()
 
 
 @shared_task
@@ -117,12 +69,24 @@ def kickoff_scrape_reviews(*args):
             step.apply_async()
 
 
-@shared_task(
-    bind=True,
-    # autoretry_for=(RequestError,),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 6},
-)
+# Scrapes
+@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 5})
+def scrape_movie_page(self, page):
+    fetcher = MoviesFetcher()
+    response = fetcher.request(page)
+    movies = MoviesParser().parse(response)
+    return movies
+
+
+@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 4})
+def scrape_movie_image(self, movie_slug, **kwargs):
+    response = ImageFetcher().request(movie_slug[0])
+    images = ImageParser().parse(response)
+    images.update(**kwargs)
+    return images
+
+
+@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 6})
 def scrape_reviews(self, movie_slug, **kwargs):
     if kwargs["process"] == "popular":
         response = PopularReviewsFetcher().request(movie_slug)
@@ -134,35 +98,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
         return reviews
 
 
-@shared_task
-def save_reviews(reviews, process):
-    session = Session()
-    for review in reviews:
-        if process == "popular":
-            movie_record = PopularReviewModel(**review)
-        elif process == "recent":
-            movie_record = RecentReviewModel(**review)
-        session.add(movie_record)
-    session.commit()
-    session.close()
-
-
-@shared_task
-def kickoff_scrape_stats():
-    movies = retrieve_movie_slugs()
-    for movie in movies:
-        movie_slug = movie[0]
-        step = scrape_movie_stats.s(movie_slug, id=movie[1])
-        step.link(save_stats.s())
-        step.apply_async()
-
-
-@shared_task(
-    bind=True,
-    # autoretry_for=(RequestError,),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 6},
-)
+@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 6})
 def scrape_movie_stats(self, movie_slug, **kwargs):
     response = StatsFetcher().request(movie_slug[0])
     stats = StatsParser().parse(response)
@@ -170,10 +106,27 @@ def scrape_movie_stats(self, movie_slug, **kwargs):
     return stats
 
 
+# Saves
+@shared_task
+def save_movies(movies):
+    for movie in movies:
+        MovieModel.objects.create(**movie)
+
+
+@shared_task
+def save_reviews(reviews, process):
+    for review in reviews:
+        if process == "popular":
+            PopularReviewModel.objects.create(**review)
+        elif process == "recent":
+            RecentReviewModel.objects.create(**review)
+
+
 @shared_task
 def save_stats(stats):
-    session = Session()
-    movie_record = StatsModel(**stats)
-    session.add(movie_record)
-    session.commit()
-    session.close()
+    StatsModel.objects.create(**stats)
+
+
+@shared_task
+def save_images(movie):
+    ImageModel.objects.create(**movie)

@@ -1,7 +1,7 @@
 import requests
 import urllib3
 from selectolax.parser import HTMLParser
-from letterboxd_scraper.utils import (
+from common.utils import (
     generate_user_agents,
     get_random_user_agent,
     get_proxy_session,
@@ -65,9 +65,7 @@ class MoviesFetcher(LetterboxdFetcher):
         tree = HTMLParser(response.content)
         total_movies = tree.css_first("p[class=ui-block-heading]").text().strip()
         total_movies = int("".join(filter(lambda x: str.isdigit(x), total_movies)))
-        movies_per_page = len(
-            [node for node in tree.css('li[class="listitem poster-container"]')]
-        )
+        movies_per_page = len([node for node in tree.css('li[class="listitem poster-container"]')])
         pagination = total_movies / movies_per_page
         pagination = pagination if pagination % 1 == 0 else int(pagination + 1)
         return pagination
