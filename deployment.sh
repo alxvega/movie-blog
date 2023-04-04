@@ -37,7 +37,7 @@ function UPDATE_CODE() {
         PIP_FLAG=0
     fi
 
-    for conn in $APP_SERVICES; do
+    for conn in $CELERY_SERVICES; do
         host=`echo $conn | cut -d "@" -f 1`
         PULL_REPO $host
         if [ "$PIP_FLAG" -eq 1 ]; then
