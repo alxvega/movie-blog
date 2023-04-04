@@ -1,19 +1,15 @@
 import requests
 import urllib3
 from selectolax.parser import HTMLParser
-from concurrent.futures import ThreadPoolExecutor
-
-# from common.utils import (
-#     generate_user_agents,
-#     get_random_user_agent,
-#     get_proxy_session,
-# )
-# from .parser import MoviesParser
-from parser import MoviesParser
+from common.utils import (
+    generate_user_agents,
+    get_random_user_agent,
+    get_proxy_session,
+)
 
 urllib3.disable_warnings()
 
-# USER_AGENTS = generate_user_agents((107, 109))
+USER_AGENTS = generate_user_agents((107, 109))
 
 
 class LetterboxdFetcher:
@@ -33,12 +29,12 @@ class LetterboxdFetcher:
     }
 
     def __init__(self) -> None:
-        self.headers[
-            "User-Agent"
-        ] = 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-        self.proxy = None
-        # self.headers["User-Agent"] = get_random_user_agent(USER_AGENTS)
-        # self.proxy = get_proxy_session()
+        # self.headers[
+        #     "User-Agent"
+        # ] = 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+        # self.proxy = None
+        self.headers["User-Agent"] = get_random_user_agent(USER_AGENTS)
+        self.proxy = get_proxy_session()
 
     def request(self, format_value, **kwargs):
         return requests.get(
