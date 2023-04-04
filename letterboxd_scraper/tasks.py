@@ -9,13 +9,15 @@ from .scraping.fetcher import (
     ImageFetcher,
     StatsFetcher,
 )
-
 from .models import (
     MovieModel,
     ImageModel,
     PopularReviewModel,
     RecentReviewModel,
     StatsModel,
+)
+from common.exceptions import (
+    RequestError,
 )
 
 
@@ -70,7 +72,12 @@ def kickoff_scrape_reviews(*args):
 
 
 # Scrapes
-@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 5})
+@shared_task(
+    bind=True,
+    default_retry_delay=600,
+    autoretry_for=(RequestError,),
+    retry_kwargs={"max_retries": 5},
+)
 def scrape_movie_page(self, page):
     fetcher = MoviesFetcher()
     response = fetcher.request(page)
@@ -79,7 +86,12 @@ def scrape_movie_page(self, page):
     return movies
 
 
-@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 4})
+@shared_task(
+    bind=True,
+    default_retry_delay=600,
+    autoretry_for=(RequestError,),
+    retry_kwargs={"max_retries": 5},
+)
 def scrape_movie_image(self, movie_slug, **kwargs):
     response = ImageFetcher().request(movie_slug[0])
     images = ImageParser().parse(response)
@@ -87,7 +99,12 @@ def scrape_movie_image(self, movie_slug, **kwargs):
     return images
 
 
-@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 6})
+@shared_task(
+    bind=True,
+    default_retry_delay=600,
+    autoretry_for=(RequestError,),
+    retry_kwargs={"max_retries": 5},
+)
 def scrape_reviews(self, movie_slug, **kwargs):
     if kwargs["process"] == "popular":
         response = PopularReviewsFetcher().request(movie_slug)
@@ -99,7 +116,12 @@ def scrape_reviews(self, movie_slug, **kwargs):
         return reviews
 
 
-@shared_task(bind=True, retry_backoff=True, retry_kwargs={"max_retries": 6})
+@shared_task(
+    bind=True,
+    default_retry_delay=600,
+    autoretry_for=(RequestError,),
+    retry_kwargs={"max_retries": 5},
+)
 def scrape_movie_stats(self, movie_slug, **kwargs):
     response = StatsFetcher().request(movie_slug[0])
     stats = StatsParser().parse(response)
