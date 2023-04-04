@@ -1,6 +1,16 @@
 version: '3.3'
 
 services:
+  django_server:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+
   worker_green:
     build:
       context: ./
@@ -29,6 +39,7 @@ services:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
+      
   celery_beat:
     build:
       context: ./
