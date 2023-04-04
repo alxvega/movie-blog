@@ -3,7 +3,10 @@ from selectolax.parser import HTMLParser
 
 
 def normalize(text):
-    return re.sub(r"\s+", " ", text).strip()
+    try:
+        return re.sub(r"\s+", " ", text).strip()
+    except TypeError:
+        return None
 
 
 def extract_number(string):
@@ -41,7 +44,9 @@ class MoviesParser:
             movie_rating = node.attrs.get("data-average-rating", None)
             movie_slug = movie_info["data-film-slug"].split("/")[-2]
             movie_id = movie_info["data-film-id"]
-            movie_title = node.css_first("img").attrs["alt"]
+            movie_title = normalize(node.css_first("img").attrs["alt"])
+            if not movie_title:
+                movie_title = movie_slug.replace("-", " ").title()
             info = {
                 "id": movie_id,
                 "title": normalize(movie_title),
