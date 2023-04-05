@@ -1,5 +1,4 @@
 import re
-import requests
 from selectolax.parser import HTMLParser
 
 
@@ -11,6 +10,8 @@ def normalize(text):
 
 
 def extract_number(string):
+    if not string:
+        return None
     return int("".join(filter(lambda x: str.isdigit(x), string)))
 
 
