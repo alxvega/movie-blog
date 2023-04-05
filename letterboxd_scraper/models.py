@@ -1,6 +1,12 @@
 from django.db import models
 
 
+class MovieModel(models.Model):
+    title = models.CharField(max_length=255)
+    slug = models.CharField(max_length=255)
+    rating = models.FloatField(null=True)
+
+
 class PopularReviewModel(models.Model):
     review_id = models.CharField(primary_key=True, max_length=255)
     name = models.CharField(max_length=255)
@@ -13,12 +19,6 @@ class RecentReviewModel(models.Model):
     name = models.CharField(max_length=255)
     review = models.TextField()
     rating = models.CharField(max_length=255)
-
-
-class MovieModel(models.Model):
-    title = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255)
-    rating = models.FloatField(null=True)
 
 
 class StatsModel(models.Model):

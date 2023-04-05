@@ -37,6 +37,7 @@ CSRF_TRUSTED_ORIGINS = ['http://0.0.0.0:8000']
 # Application definition
 LOCAL_APPS = [
     'letterboxd_scraper',
+    'movies_api',
 ]
 
 INSTALLED_APPS = [
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'django_json_widget',
     'import_export',
     'rangefilter',
+    'rest_framework',
 ] + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -81,6 +83,14 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 WSGI_APPLICATION = "movies_blog.wsgi.application"
 
