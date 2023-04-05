@@ -123,7 +123,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_stats(self, movie_slug, **kwargs):
-    response = StatsFetcher().request(movie_slug[0])
+    response = StatsFetcher().request(movie_slug)
     stats = StatsParser().parse(response)
     stats.update(**kwargs)
     return stats
