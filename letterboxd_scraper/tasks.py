@@ -18,6 +18,7 @@ from .models import (
 )
 from common.exceptions import (
     RequestError,
+    ProxyError,
 )
 
 
@@ -59,13 +60,12 @@ def kickoff_scrape_reviews(*args):
     process = args[0] if args else None
     movies = retrieve_movie_slugs()
     for movie in movies:
-        movie_slug = movie[0]
         if not process or process == "popular":
-            step = scrape_reviews.s(movie_slug, id=movie[1], process="popular")
+            step = scrape_reviews.s(movie_slug=movie[1], id=movie[0], process="popular")
             step.link(save_reviews.s("popular"))
             step.apply_async()
         if not process or process == "recent":
-            step = scrape_reviews.s(movie_slug, id=movie[1], process="recent")
+            step = scrape_reviews.s(movie_slug=movie[1], id=movie[0], process="recent")
             step.link(save_reviews.s("recent"))
             step.apply_async()
 
@@ -74,7 +74,7 @@ def kickoff_scrape_reviews(*args):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError,),
+    autoretry_for=(RequestError, ProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_page(self, page):
@@ -88,11 +88,11 @@ def scrape_movie_page(self, page):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError,),
+    autoretry_for=(RequestError, ProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_image(self, movie_slug, **kwargs):
-    response = ImageFetcher().request(movie_slug[0])
+    response = ImageFetcher().request(movie_slug)
     images = ImageParser().parse(response)
     images.update(**kwargs)
     return images
@@ -101,7 +101,7 @@ def scrape_movie_image(self, movie_slug, **kwargs):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError,),
+    autoretry_for=(RequestError, ProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_reviews(self, movie_slug, **kwargs):
@@ -118,7 +118,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError,),
+    autoretry_for=(RequestError, ProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_stats(self, movie_slug, **kwargs):

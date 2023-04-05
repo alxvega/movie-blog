@@ -6,6 +6,7 @@ from common.utils import (
     get_random_user_agent,
     get_proxy_session,
 )
+from common.exceptions import catch_proxy_error
 
 urllib3.disable_warnings()
 
@@ -29,13 +30,10 @@ class LetterboxdFetcher:
     }
 
     def __init__(self) -> None:
-        # self.headers[
-        #     "User-Agent"
-        # ] = 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-        # self.proxy = None
         self.headers["User-Agent"] = get_random_user_agent(USER_AGENTS)
         self.proxy = get_proxy_session()
 
+    @catch_proxy_error
     def request(self, format_value, **kwargs):
         return requests.get(
             self.url.format(format_value),
