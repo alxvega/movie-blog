@@ -132,10 +132,7 @@ def scrape_movie_stats(self, movie_slug, **kwargs):
 # Saves
 @shared_task
 def save_movies(movies):
-    for movie in movies:
-        _, created = MovieModel.objects.get_or_create(id=movie['id'], defaults=movie)
-        if not created:
-            print(f"Movie with id {movie['id']} already exists in the database.")
+    MovieModel.objects.bulk_create([MovieModel(**movie) for movie in movies], ignore_conflicts=True)
 
 
 @shared_task
