@@ -73,19 +73,3 @@ class MoviesFetcher(LetterboxdFetcher):
         pagination = total_movies / movies_per_page
         pagination = pagination if pagination % 1 == 0 else int(pagination + 1)
         return int(pagination)
-
-
-# if __name__ == '__main__':
-#     # def fetch_and_parse(movie_id):
-#     #     try:
-#     #         response = MoviesFetcher().request(movie_id)
-#     #         content = MoviesParser().parse(response)
-#     #         print(movie_id)
-#     #     except Exception as e:
-#     #         print(f'{movie_id} failed manitooo')
-
-#     # with ThreadPoolExecutor(max_workers=2) as executor:
-#     #     futures = [executor.submit(fetch_and_parse, i) for i in range(160, 10000)]
-#     response = MoviesFetcher().request(339)
-#     content = MoviesParser().parse(response)
-#     print(content)

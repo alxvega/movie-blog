@@ -1,4 +1,5 @@
 import re
+import requests
 from selectolax.parser import HTMLParser
 
 
@@ -60,9 +61,9 @@ class MoviesParser:
 class StatsParser:
     def parse(self, response):
         tree = HTMLParser(response.content)
-        views = tree.css_first('a[class*="icon-watched"]').attrs["title"]
-        playlists_number = tree.css_first('a[class*="icon-list"]').attrs["title"]
-        likes = tree.css_first('a[class*="icon-liked"]').attrs["title"]
+        views = tree.css_first('li[class*="stat filmstat-watches"]').text()
+        playlists_number = tree.css_first('li[class*="stat filmstat-lists"]').text()
+        likes = tree.css_first('li[class*="stat filmstat-likes"]').text()
         item = {
             "views": extract_number(views),
             "likes": extract_number(likes),
