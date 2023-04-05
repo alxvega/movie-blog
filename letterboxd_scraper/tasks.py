@@ -38,11 +38,12 @@ def kickoff_initial_movies_data():
 @shared_task
 def kickoff_scrape_stats():
     movies = retrieve_movie_slugs()
-    for movie in movies:
-        movie_slug = movie[0]
-        step = scrape_movie_stats.s(movie_slug, id=movie[1])
-        step.link(save_stats.s())
-        step.apply_async()
+    print(movies)
+    # for movie in movies:
+    #     movie_slug = movie[0]
+    #     step = scrape_movie_stats.s(movie_slug, id=movie[1])
+    #     step.link(save_stats.s())
+    #     step.apply_async()
 
 
 @shared_task
