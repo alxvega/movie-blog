@@ -29,9 +29,7 @@ class ReviewsParser:
                 "name": normalize(author.text()),
                 "review": normalize(text.text()),
                 "rating": normalize(rating.text()) if rating else None,
-                # "review_id": review_id,
             }
-            kwargs.pop('process')
             review_item.update(kwargs)
             items.append(review_item)
         return items

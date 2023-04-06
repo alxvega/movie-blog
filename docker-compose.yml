@@ -28,6 +28,24 @@ services:
     volumes:
       - .:/app
 
+  worker_rate_limit_grp0:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A movies_blog worker -Q rate_limit_grp0 -P gevent -c 100 -l info -E ---prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip
+
+    volumes:
+      - .:/app
+
+  worker_rate_limit_grp1:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A movies_blog worker -Q rate_limit_grp1 -P gevent -c 100 -l info -E ---prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip
+
+    volumes:
+      - .:/app
+
   flower:
     build:
       context: ./

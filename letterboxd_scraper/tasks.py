@@ -62,11 +62,11 @@ def kickoff_scrape_reviews(*args):
     movies = retrieve_movie_slugs()
     for movie in movies:
         if not process or process == "popular":
-            step = scrape_reviews.s(movie_slug=movie[1], id=movie[0], process="popular")
+            step = scrape_reviews.s(movie_slug=movie[1], process="popular", movie_id=movie[0])
             step.link(save_reviews.s("popular"))
             step.apply_async()
         if not process or process == "recent":
-            step = scrape_reviews.s(movie_slug=movie[1], id=movie[0], process="recent")
+            step = scrape_reviews.s(movie_slug=movie[1], process="recent", movie_id=movie[0])
             step.link(save_reviews.s("recent"))
             step.apply_async()
 
@@ -106,12 +106,12 @@ def scrape_movie_image(self, movie_slug, **kwargs):
     retry_kwargs={"max_retries": 5},
     # rate_limit=f'{800 // WORKERS}/m',
 )
-def scrape_reviews(self, movie_slug, **kwargs):
-    if kwargs["process"] == "popular":
+def scrape_reviews(self, movie_slug, process, **kwargs):
+    if process == "popular":
         response = PopularReviewsFetcher().request(movie_slug)
         reviews = ReviewsParser().parse(response, **kwargs)
         return reviews
-    elif kwargs["process"] == "recent":
+    elif process == "recent":
         response = RecentReviewsFetcher().request(movie_slug)
         reviews = ReviewsParser().parse(response, **kwargs)
         return reviews

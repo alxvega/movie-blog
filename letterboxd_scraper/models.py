@@ -8,16 +8,17 @@ class MovieModel(models.Model):
 
 
 class PopularReviewModel(models.Model):
-    # movie_id = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
+    movie_id = models.CharField(null=True)
     name = models.CharField(max_length=255)
     review = models.TextField()
-    rating = models.CharField(max_length=255)
+    rating = models.CharField(max_length=255, null=True)
 
 
 class RecentReviewModel(models.Model):
+    movie_id = models.CharField(null=True)
     name = models.CharField(max_length=255)
     review = models.TextField()
-    rating = models.CharField(max_length=255)
+    rating = models.CharField(max_length=255, null=True)
 
 
 class StatsModel(models.Model):
