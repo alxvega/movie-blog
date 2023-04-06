@@ -11,7 +11,7 @@ from letterboxd_scraper.models import (
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieModel
-        fields = ('id, title', 'slug', 'rating')
+        fields = ('id', 'title', 'slug', 'rating')
 
 
 class PopularReviewSerializer(serializers.ModelSerializer):
