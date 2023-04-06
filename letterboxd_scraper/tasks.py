@@ -109,11 +109,11 @@ def scrape_movie_image(self, movie_slug, **kwargs):
 def scrape_reviews(self, movie_slug, **kwargs):
     if kwargs["process"] == "popular":
         response = PopularReviewsFetcher().request(movie_slug)
-        reviews = ReviewsParser().parse(response, id=kwargs["id"], **kwargs)
+        reviews = ReviewsParser().parse(response, **kwargs)
         return reviews
     elif kwargs["process"] == "recent":
         response = RecentReviewsFetcher().request(movie_slug)
-        reviews = ReviewsParser().parse(response, id=kwargs["id"], **kwargs)
+        reviews = ReviewsParser().parse(response, **kwargs)
         return reviews
 
 
