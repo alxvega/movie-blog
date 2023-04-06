@@ -2,7 +2,13 @@
 SSH_USER='alex'
 SRC_DIRECTORY='/home/alex/scraping-infra'
 source .env
-read -p "Enter the branch you want to set " CURRENT_BRANCH
+
+CURRENT_BRANCH="$1"
+
+# If no branch is provided, prompt the user for one
+if [[ -z "$CURRENT_BRANCH" ]]; then
+    read -p "Enter the branch you want to set " CURRENT_BRANCH
+fi
 
 function PULL_REPO() {
     SSH_CMD="cd $SRC_DIRECTORY && git checkout $CURRENT_BRANCH && git pull"
