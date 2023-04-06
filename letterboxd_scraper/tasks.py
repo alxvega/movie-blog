@@ -95,8 +95,7 @@ def scrape_movie_page(self, page):
 )
 def scrape_movie_image(self, movie_slug, **kwargs):
     response = ImageFetcher().request(movie_slug)
-    images = ImageParser().parse(response)
-    images.update(**kwargs)
+    images = ImageParser().parse(response, **kwargs)
     return images
 
 
@@ -114,7 +113,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
         return reviews
     elif kwargs["process"] == "recent":
         response = RecentReviewsFetcher().request(movie_slug)
-        reviews = ReviewsParser().parse(response, id=kwargs["id"])
+        reviews = ReviewsParser().parse(response, id=kwargs["id"], **kwargs)
         return reviews
 
 
@@ -127,8 +126,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
 )
 def scrape_movie_stats(self, movie_slug, **kwargs):
     response = StatsFetcher().request(movie_slug)
-    stats = StatsParser().parse(response)
-    stats.update(**kwargs)
+    stats = StatsParser().parse(response, **kwargs)
     return stats
 
 

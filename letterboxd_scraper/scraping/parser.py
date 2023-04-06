@@ -60,7 +60,7 @@ class MoviesParser:
 
 
 class StatsParser:
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         tree = HTMLParser(response.content)
         views = tree.css_first('li[class*="stat filmstat-watches"]').text()
         playlists_number = tree.css_first('li[class*="stat filmstat-lists"]').text()
@@ -70,11 +70,12 @@ class StatsParser:
             "likes": extract_number(likes),
             "added_to_playlist": extract_number(playlists_number),
         }
+        item.update(kwargs)
         return item
 
 
 class ImageParser:
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         tree = HTMLParser(response.content)
         image = tree.css_first("img").attrs.get("srcset", None)
         resized_image = tree.css_first("img").attrs["src"]
@@ -86,4 +87,5 @@ class ImageParser:
             "poster_url": image,
             "resized_poster": resized_image,
         }
+        item.update(kwargs)
         return item
