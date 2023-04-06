@@ -15,7 +15,7 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q green -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip --purge
+    command: celery -A movies_blog worker -Q green -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip
     volumes:
       - .:/app
 
@@ -23,7 +23,7 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip --purge
+    command: celery -A movies_blog worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip
 
     volumes:
       - .:/app
