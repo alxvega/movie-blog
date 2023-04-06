@@ -21,7 +21,7 @@ class ReviewsParser:
         movie_grid = tree.css('li[class*="film-detail"]')
         items = []
         for review in movie_grid:
-            review_id = review.attrs["data-viewing-id"]
+            # review_id = review.attrs["data-viewing-id"]
             author = review.css_first('strong[class="name"]')
             text = review.css_first('div[class*="body-text"]')
             rating = review.css_first('span[class*="rating"]')
@@ -29,7 +29,7 @@ class ReviewsParser:
                 "name": normalize(author.text()),
                 "review": normalize(text.text()),
                 "rating": normalize(rating.text()) if rating else None,
-                "review_id": review_id,
+                # "review_id": review_id,
             }
             review_item.update(kwargs)
             items.append(review_item)

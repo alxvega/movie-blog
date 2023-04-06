@@ -77,7 +77,6 @@ def kickoff_scrape_reviews(*args):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
 )
 def scrape_movie_page(self, page):
     fetcher = MoviesFetcher()
@@ -92,7 +91,7 @@ def scrape_movie_page(self, page):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
+    # rate_limit=f'{800 // WORKERS}/m',
 )
 def scrape_movie_image(self, movie_slug, **kwargs):
     response = ImageFetcher().request(movie_slug)
@@ -112,10 +111,12 @@ def scrape_reviews(self, movie_slug, **kwargs):
     if kwargs["process"] == "popular":
         response = PopularReviewsFetcher().request(movie_slug)
         reviews = ReviewsParser().parse(response, id=kwargs["id"])
+        reviews.update(kwargs)
         return reviews
     elif kwargs["process"] == "recent":
         response = RecentReviewsFetcher().request(movie_slug)
         reviews = ReviewsParser().parse(response, id=kwargs["id"])
+        reviews.update(kwargs)
         return reviews
 
 
