@@ -18,7 +18,7 @@ from .models import (
 )
 from common.exceptions import (
     RequestError,
-    ProxyError,
+    StaleProxyError,
 )
 
 
@@ -74,7 +74,7 @@ def kickoff_scrape_reviews(*args):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError, ProxyError),
+    autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_page(self, page):
@@ -88,7 +88,7 @@ def scrape_movie_page(self, page):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError, ProxyError),
+    autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_image(self, movie_slug, **kwargs):
@@ -101,7 +101,7 @@ def scrape_movie_image(self, movie_slug, **kwargs):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError, ProxyError),
+    autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_reviews(self, movie_slug, **kwargs):
@@ -118,7 +118,7 @@ def scrape_reviews(self, movie_slug, **kwargs):
 @shared_task(
     bind=True,
     default_retry_delay=600,
-    autoretry_for=(RequestError, ProxyError),
+    autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
 )
 def scrape_movie_stats(self, movie_slug, **kwargs):
