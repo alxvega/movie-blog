@@ -51,8 +51,7 @@ def kickoff_scrape_stats():
 def kickoff_scrape_images():
     movies = retrieve_movie_slugs()
     for movie in movies:
-        movie_slug = movie[0]
-        step = scrape_movie_image.s(movie_slug, id=movie[1])
+        step = scrape_movie_image.s(movie_slug=movie[1], id=movie[0])
         step.link(save_images.s())
         step.apply_async()
 
@@ -107,7 +106,7 @@ def scrape_movie_image(self, movie_slug, **kwargs):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
+    # rate_limit=f'{800 // WORKERS}/m',
 )
 def scrape_reviews(self, movie_slug, **kwargs):
     if kwargs["process"] == "popular":
@@ -142,11 +141,10 @@ def save_movies(movies):
 
 @shared_task
 def save_reviews(reviews, process):
-    for review in reviews:
-        if process == "popular":
-            PopularReviewModel.objects.create(**review)
-        elif process == "recent":
-            RecentReviewModel.objects.create(**review)
+    if process == 'popular':
+        PopularReviewModel.objects.bulk_create([PopularReviewModel(**review) for review in reviews])
+    elif process == 'recent':
+        RecentReviewModel.objects.bulk_create([RecentReviewModel(**review) for review in reviews])
 
 
 @shared_task
