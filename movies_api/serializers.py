@@ -17,13 +17,13 @@ class MovieSerializer(serializers.ModelSerializer):
 class PopularReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = PopularReviewModel
-        fields = ('id', 'review_id', 'name', 'review', 'rating')
+        fields = ('id', 'movie_id', 'name', 'review', 'rating')
 
 
 class RecentReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecentReviewModel
-        fields = ('id', 'review_id', 'name', 'review', 'rating')
+        fields = ('id', 'movie_id', 'name', 'review', 'rating')
 
 
 class StatsSerializer(serializers.ModelSerializer):
