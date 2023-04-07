@@ -179,8 +179,11 @@ mapping_tasks = [
     ('letterboxd_scraper.tasks.*', {'queue': 'green'}),
 ]
 
-mapping_tasks.insert(0, ('letterboxd_scraper.tasks.save_*', {'queue': 'database'}))
-mapping_tasks.insert(0, ('letterboxd_scraper.scrape_movie_stats*', {'queue': 'rate_limit_grp0'}))
+mapping_tasks.insert(0, ('*.save_*', {'queue': 'database'}))
+mapping_tasks.insert(0, ('*.kickoff_scrape_stats*', {'queue': 'rate_limit_grp0'}))
+mapping_tasks.insert(0, ('*.kickoff_scrape_reviews*', {'queue': 'rate_limit_grp1'}))
+mapping_tasks.insert(0, ('*.scrape_movie_stats*', {'queue': 'rate_limit_grp0'}))
+mapping_tasks.insert(0, ('*.scrape_reviews*', {'queue': 'rate_limit_grp1'}))
 
 CELERY_TASK_ROUTES = (mapping_tasks,)
 

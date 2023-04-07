@@ -5,7 +5,6 @@ source .env
 
 CURRENT_BRANCH="$1"
 
-# If no branch is provided, prompt the user for one
 if [[ -z "$CURRENT_BRANCH" ]]; then
     read -p "Enter the branch you want to set " CURRENT_BRANCH
 fi
@@ -29,23 +28,23 @@ function RESTART_CONTAINER() {
 
 
 function UPDATE_CODE() {
-    host=`echo $CELERY_SERVICES | cut -d "@" -f 1`
-    echo $host
-    echo "Get requirements from $SSH_USER@$host:$SRC_DIRECTORY"
+    IFS=' ' read -ra HOSTS <<< "$HOSTS"
+    host=`echo $HOSTS | cut -d "@" -f 1`
+    echo "Getting requirements.txt from $SSH_USER@$host:$SRC_DIRECTORY"
     scp $SSH_USER@$host:$SRC_DIRECTORY/requirements.txt ./requirements_remote.txt
     PIP_STATUS="$(cmp -s ./requirements_remote.txt /home/alex/scraping-infra/requirements.txt; echo $?)"
     rm ./requirements_remote.txt
+
     if [ "$PIP_STATUS" -eq 1 ]; then
-    echo "Requirements have been updated. Packages will be installed."
+        echo "Requirements have been updated. Packages will be installed."
         PIP_FLAG=1
     else
         echo "Requirements have not been touched. Skipping libraries update"
         PIP_FLAG=0
     fi
 
-    for conn in $CELERY_SERVICES; do
-        host=`echo $conn | cut -d "@" -f 1`
-        PULL_REPO $host
+    for host in "${HOSTS[@]}"; do
+        PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
             PIP_INSTALL $host
             if ! [ $? -eq 0 ]; then
@@ -55,6 +54,7 @@ function UPDATE_CODE() {
         fi
     done
 }
+
 
 
 function RESTART_ENVIRONMENT() {
