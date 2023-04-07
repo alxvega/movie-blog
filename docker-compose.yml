@@ -6,6 +6,7 @@ services:
       context: ./
       dockerfile: compose/Dockerfile
     command: python3 manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
     volumes:
       - .:/app
     ports:
@@ -16,6 +17,7 @@ services:
       context: ./
       dockerfile: compose/Dockerfile
     command: celery -A movies_blog worker -Q triggers -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip
+    restart: unless-stopped
     volumes:
       - .:/app
 
@@ -23,7 +25,8 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q green -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip --purge
+    command: celery -A movies_blog worker -Q green -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip
+    restart: unless-stopped
     volumes:
       - .:/app
 
@@ -31,8 +34,8 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip --purge
-
+    restart: unless-stopped
+    command: celery -A movies_blog worker -Q database -P gevent -c 50 -l info -E -n database@%h --without-mingle --without-gossip
     volumes:
       - .:/app
 
@@ -40,8 +43,8 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q rate_limit_grp0 -P gevent -c 100 -l info -E --prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip --purge
-
+    restart: unless-stopped
+    command: celery -A movies_blog worker -Q rate_limit_grp0 -P gevent -c 100 -l info -E --prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip
     volumes:
       - .:/app
 
@@ -49,8 +52,8 @@ services:
     build:
       context: ./
       dockerfile: compose/Dockerfile
-    command: celery -A movies_blog worker -Q rate_limit_grp1 -P gevent -c 100 -l info -E --prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip --purge
-
+    restart: unless-stopped
+    command: celery -A movies_blog worker -Q rate_limit_grp1 -P gevent -c 100 -l info -E --prefetch-multiplier=1 -n ratelimit_grp0@%h --without-mingle --without-gossip
     volumes:
       - .:/app
 
@@ -59,6 +62,7 @@ services:
       context: ./
       dockerfile: compose/Dockerfile
     command: celery -A movies_blog flower --max_tasks=100000 --purge_offline_workers=180
+    restart: unless-stopped
     volumes:
       - .:/app
     environment:
@@ -71,6 +75,7 @@ services:
       context: ./
       dockerfile: compose/Dockerfile
     command: celery -A movies_blog beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    restart: unless-stopped
     volumes:
       - .:/app
       
