@@ -10,14 +10,14 @@ class MovieModel(models.Model):
 class PopularReviewModel(models.Model):
     movie_id = models.CharField(null=True)
     name = models.CharField(max_length=255)
-    review = models.TextField()
+    review = models.TextField(max_length=800)
     rating = models.CharField(max_length=255, null=True)
 
 
 class RecentReviewModel(models.Model):
     movie_id = models.CharField(null=True)
     name = models.CharField(max_length=255)
-    review = models.TextField()
+    review = models.TextField(max_length=800)
     rating = models.CharField(max_length=255, null=True)
 
 
