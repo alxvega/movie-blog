@@ -11,6 +11,14 @@ services:
     ports:
       - "8000:8000"
 
+  worker_triggers:
+    build:
+      context: ./
+      dockerfile: compose/Dockerfile
+    command: celery -A movies_blog worker -Q triggers -P gevent -c 100 -l info -E -n green@%h --without-mingle --without-gossip
+    volumes:
+      - .:/app
+
   worker_green:
     build:
       context: ./

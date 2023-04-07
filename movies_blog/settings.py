@@ -180,8 +180,7 @@ mapping_tasks = [
 ]
 
 mapping_tasks.insert(0, ('*.save_*', {'queue': 'database'}))
-mapping_tasks.insert(0, ('*.kickoff_scrape_stats*', {'queue': 'rate_limit_grp0'}))
-mapping_tasks.insert(0, ('*.kickoff_scrape_reviews*', {'queue': 'rate_limit_grp1'}))
+mapping_tasks.insert(0, ('*.kickoff*', {'queue': 'triggers'}))
 mapping_tasks.insert(0, ('*.scrape_movie_stats*', {'queue': 'rate_limit_grp0'}))
 mapping_tasks.insert(0, ('*.scrape_reviews*', {'queue': 'rate_limit_grp1'}))
 
