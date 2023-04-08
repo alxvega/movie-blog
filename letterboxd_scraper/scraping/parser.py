@@ -2,6 +2,13 @@ import re
 from selectolax.parser import HTMLParser
 
 
+def extract_text(selector):
+    try:
+        return selector.text()
+    except TypeError:
+        return None
+
+
 def normalize(text):
     try:
         return re.sub(r"\s+", " ", text).strip()
@@ -21,14 +28,13 @@ class ReviewsParser:
         movie_grid = tree.css('li[class*="film-detail"]')
         items = []
         for review in movie_grid:
-            # review_id = review.attrs["data-viewing-id"]
             author = review.css_first('strong[class="name"]')
             text = review.css_first('div[class*="body-text"]')
             rating = review.css_first('span[class*="rating"]')
             review_item = {
-                "name": normalize(author.text()),
-                "review": normalize(text.text()),
-                "rating": normalize(rating.text()) if rating else None,
+                "name": normalize(extract_text(author)),
+                "review": normalize(extract_text(text)),
+                "rating": normalize(extract_text(rating)),
             }
             review_item.update(kwargs)
             items.append(review_item)
@@ -61,9 +67,9 @@ class MoviesParser:
 class StatsParser:
     def parse(self, response, **kwargs):
         tree = HTMLParser(response.content)
-        views = tree.css_first('li[class*="stat filmstat-watches"]').text()
-        playlists_number = tree.css_first('li[class*="stat filmstat-lists"]').text()
-        likes = tree.css_first('li[class*="stat filmstat-likes"]').text()
+        views = extract_text(tree.css_first('li[class*="stat filmstat-watches"]'))
+        playlists_number = extract_text(tree.css_first('li[class*="stat filmstat-lists"]'))
+        likes = extract_text(tree.css_first('li[class*="stat filmstat-likes"]'))
         item = {
             "views": extract_number(views),
             "likes": extract_number(likes),
