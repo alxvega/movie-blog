@@ -24,8 +24,8 @@ from common.exceptions import (
 
 logger = get_task_logger(__name__)
 
-WORKERS = 7
-WORKERS_RATE_LIMIT = 3
+WORKERS = 8
+WORKERS_RATE_LIMIT = 5
 
 
 # Triggers
@@ -93,7 +93,6 @@ def scrape_movie_page(self, page):
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
     rate_limit=f'{800 // WORKERS}/m',
-    # rate_limit=f'500/m',
 )
 def scrape_movie_image(self, movie_slug, **kwargs):
     response = ImageFetcher().request(movie_slug)
