@@ -22,6 +22,7 @@ function REBUILD_DOCKER_IMAGE() {
     SSH_CMD="cd $SRC_DIRECTORY && \
              docker compose -f docker-compose.yml stop && \
              docker build -t scraping_infra:latest -f compose/Dockerfile \
+             --cache-from scraping_infra:latest \
              --build-arg NEW_PACKAGES=\"$new_packages\" \
              ."
     ssh "$SSH_USER"@$host "$SSH_CMD"
