@@ -29,12 +29,12 @@ function RESTART_CONTAINER() {
 function UPDATE_CODE() {
     IFS=' ' read -ra HOSTS <<< "$HOSTS"
     host=`echo $HOSTS | cut -d "@" -f 1`
-    echo "Getting requirements.txt from $SSH_USER@$host:$SRC_DIRECTORY"
-    scp $SSH_USER@$host:$SRC_DIRECTORY/requirements.txt ./requirements_remote.txt
-    PIP_STATUS="$(cmp -s ./requirements_remote.txt /home/alex/scraping-infra/requirements.txt; echo $?)"
-    rm ./requirements_remote.txt
+    
+    # Compare remote requirements.txt with the one in the remote branch
+    REMOTE_REQ_HASH=$(ssh "$SSH_USER"@$host "cd $SRC_DIRECTORY && git ls-tree -r $CURRENT_BRANCH --name-only | grep requirements.txt")
+    LOCAL_REQ_HASH=$(ssh "$SSH_USER"@$host "cd $SRC_DIRECTORY && git ls-tree -r HEAD --name-only | grep requirements.txt")
 
-    if [ "$PIP_STATUS" -eq 1 ]; then
+    if [ "$REMOTE_REQ_HASH" != "$LOCAL_REQ_HASH" ]; then
         echo "Requirements have been updated. Packages will be installed."
         PIP_FLAG=1
     else
