@@ -79,8 +79,8 @@ END
 
 function RESTART_ENVIRONMENT() {
     for conn in $CELERY_SERVICES; do
-        host=echo $conn | cut -d "@" -f 1
-        celery_service=echo $conn | cut -d "@" -f 2
+        host=$(echo $conn | cut -d "@" -f 1)
+        celery_service=$(echo $conn | cut -d "@" -f 2)
         RESTART_CONTAINER $host $celery_service &
         if ! [ $? -eq 0 ]; then
             echo "Error: RESTART_CONTAINER failed for $celery_service at $host. Stopping pipeline"
@@ -89,6 +89,7 @@ function RESTART_ENVIRONMENT() {
     done
     wait
 }
+
 
 UPDATE_CODE
 RESTART_ENVIRONMENT
