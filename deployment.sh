@@ -30,11 +30,12 @@ function UPDATE_CODE() {
     IFS=' ' read -ra HOSTS <<< "$HOSTS"
     host=`echo $HOSTS | cut -d "@" -f 1`
     
-    # Compare remote requirements.txt with the one in the remote branch
-    REMOTE_REQ_HASH=$(ssh "$SSH_USER"@$host "cd $SRC_DIRECTORY && git ls-tree -r $CURRENT_BRANCH --name-only | grep requirements.txt")
-    LOCAL_REQ_HASH=$(ssh "$SSH_USER"@$host "cd $SRC_DIRECTORY && git ls-tree -r HEAD --name-only | grep requirements.txt")
+    # Compare local requirements.txt content with the one on a remote machine
+    scp $SSH_USER@$host:$SRC_DIRECTORY/requirements.txt ./requirements_remote.txt
+    DIFF_OUTPUT="$(diff ./requirements.txt ./requirements_remote.txt)"
+    rm ./requirements_remote.txt
 
-    if [ "$REMOTE_REQ_HASH" != "$LOCAL_REQ_HASH" ]; then
+    if [ -n "$DIFF_OUTPUT" ]; then
         echo "Requirements have been updated. Packages will be installed."
         PIP_FLAG=1
     else
