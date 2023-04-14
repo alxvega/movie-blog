@@ -17,8 +17,10 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Mount cache for pip packages
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r /app/requirements.txt
+# Copy requirements.txt and install requirements
+COPY requirements.txt .
+RUN pip install --upgrade -r requirements.txt #I NEED THIS TO BE CACHED.
+
 # Conditionally install new packages if any
 RUN if [ -n "$NEW_PACKAGES" ]; then \
         pip install --no-cache-dir --upgrade $NEW_PACKAGES; \
