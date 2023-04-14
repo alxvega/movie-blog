@@ -1,38 +1,42 @@
 from django.db import models
+from django.utils import timezone
 
 
 class MovieModel(models.Model):
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=255)
-    rating = models.FloatField(null=True)
-    extraction_datetime = models.DateTimeField(null=True, auto_now_add=True)
-
-
-class PopularReviewModel(models.Model):
-    movie_id = models.CharField(null=True)
-    name = models.CharField(max_length=800)
-    review = models.TextField(max_length=800)
-    rating = models.CharField(max_length=800, null=True)
-    extraction_datetime = models.DateTimeField(null=True, auto_now_add=True)
-
-
-class RecentReviewModel(models.Model):
-    movie_id = models.CharField(null=True)
-    name = models.CharField(max_length=800)
-    review = models.TextField(max_length=800)
-    rating = models.CharField(max_length=800, null=True)
-    extraction_datetime = models.DateTimeField(null=True, auto_now_add=True)
-
-
-class StatsModel(models.Model):
-    views = models.IntegerField()
-    likes = models.IntegerField()
-    added_to_playlist = models.IntegerField()
-    extraction_datetime = models.DateTimeField(null=True, auto_now_add=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    extraction_datetime = models.DateTimeField(default=timezone.now)
 
 
 class ImageModel(models.Model):
-    release_year = models.IntegerField(null=True)
-    poster_url = models.CharField(max_length=800, null=True)
-    resized_poster = models.CharField(max_length=800)
-    extraction_datetime = models.DateTimeField(null=True, auto_now_add=True)
+    movie = models.OneToOneField(MovieModel, on_delete=models.CASCADE, primary_key=True)
+    release_year = models.IntegerField(null=True, blank=True)
+    poster_url = models.URLField(null=True, blank=True)
+    resized_poster = models.URLField(null=True, blank=True)
+    extraction_datetime = models.DateTimeField(default=timezone.now)
+
+
+class PopularReviewModel(models.Model):
+    movie = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    review = models.TextField()
+    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    extraction_datetime = models.DateTimeField(default=timezone.now)
+
+
+class RecentReviewModel(models.Model):
+    movie = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    review = models.TextField()
+    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    extraction_datetime = models.DateTimeField(default=timezone.now)
+
+
+class StatsModel(models.Model):
+    movie = models.OneToOneField(MovieModel, on_delete=models.CASCADE, primary_key=True)
+    views = models.IntegerField()
+    likes = models.IntegerField()
+    added_to_playlist = models.IntegerField()
+    extraction_datetime = models.DateTimeField(default=timezone.now)

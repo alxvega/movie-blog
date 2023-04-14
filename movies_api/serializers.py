@@ -15,24 +15,32 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class PopularReviewSerializer(serializers.ModelSerializer):
+    movie = MovieSerializer()
+
     class Meta:
         model = PopularReviewModel
-        fields = ('id', 'movie_id', 'name', 'review', 'rating')
+        fields = ('id', 'movie', 'name', 'review', 'rating')
 
 
 class RecentReviewSerializer(serializers.ModelSerializer):
+    movie = MovieSerializer()
+
     class Meta:
         model = RecentReviewModel
-        fields = ('id', 'movie_id', 'name', 'review', 'rating')
+        fields = ('id', 'movie', 'name', 'review', 'rating')
 
 
 class StatsSerializer(serializers.ModelSerializer):
+    movie = MovieSerializer()
+
     class Meta:
         model = StatsModel
-        fields = ('id', 'views', 'likes', 'added_to_playlist')
+        fields = ('movie', 'views', 'likes', 'added_to_playlist')
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    movie = MovieSerializer()
+
     class Meta:
         model = ImageModel
-        fields = ('id', 'release_year', 'poster_url', 'resized_poster')
+        fields = ('movie', 'release_year', 'poster_url', 'resized_poster')

@@ -15,17 +15,17 @@ function PULL_REPO() {
     ssh "$SSH_USER"@$1 "$SSH_CMD"
 }
 
-function PIP_INSTALL() {
-    scp ./requirements.txt $SSH_USER@$1:$SRC_DIRECTORY/requirements.txt SSH_CMD="cd $SRC_DIRECTORY && /usr/local/bin/docker build -t  scraping_infra -f compose/Dockerfile . "
+function REBUILD_DOCKER_IMAGE() {
+    scp ./requirements.txt $SSH_USER@$1:$SRC_DIRECTORY/requirements.txt
+    SSH_CMD="cd $SRC_DIRECTORY && /usr/local/bin/docker build -t  scraping_infra -f compose/Dockerfile . && docker-compose -f docker-compose.yml down && docker-compose -f docker-compose.yml up -d"
     ssh "$SSH_USER"@$1 "$SSH_CMD"
-    echo "Updated libraries successfully."
+    echo "Rebuilt Docker image and restarted container successfully." 
 }
 
 function RESTART_CONTAINER() {
-    SSH_CMD="cd $SRC_DIRECTORY && docker compose -f docker-compose.yml restart $2"
+    SSH_CMD="cd $SRC_DIRECTORY && docker-compose -f docker-compose.yml restart $2"
     ssh "$SSH_USER"@"$1" "$SSH_CMD"
 }
-
 
 function UPDATE_CODE() {
     IFS=' ' read -ra HOSTS <<< "$HOSTS"
@@ -46,16 +46,14 @@ function UPDATE_CODE() {
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            PIP_INSTALL $host
+            REBUILD_DOCKER_IMAGE $host
             if ! [ $? -eq 0 ]; then
-                echo "Error: PIP_INSTALL failed for $host. Stopping pipeline"
+                echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
                 exit 1
             fi
         fi
     done
 }
-
-
 
 function RESTART_ENVIRONMENT() {
     for conn in $CELERY_SERVICES; do
@@ -63,10 +61,10 @@ function RESTART_ENVIRONMENT() {
         celery_service=`echo $conn | cut -d "@" -f 2`
         RESTART_CONTAINER $host $celery_service &
         if ! [ $? -eq 0 ]; then
-                echo "Error: RESTART_CONTAINER failed for $celery_service at $host. Stopping pipeline"
-                exit 1
-            fi
-        done
+            echo "Error: RESTART_CONTAINER failed for $celery_service at $host. Stopping pipeline"
+            exit 1
+        fi
+    done
     wait
 }
 
