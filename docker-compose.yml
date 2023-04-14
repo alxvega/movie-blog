@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 
 services:
   django_server:
@@ -69,7 +69,7 @@ services:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     ports:
       - "5555:5555"
-      
+
   celery_beat:
     build:
       context: ./
@@ -78,7 +78,7 @@ services:
     restart: unless-stopped
     volumes:
       - .:/app
-      
+
   postgres_db:
     image: postgres:13
     command: postgres -B 160MB -N 800
@@ -94,7 +94,7 @@ services:
 
   redis:
     image: redis:6.2
-    command: [ "redis-server", "--appendonly", "yes" ]
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis_data:/data
     ports:
