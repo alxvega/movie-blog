@@ -16,9 +16,9 @@ function PULL_REPO() {
 }
 
 function REBUILD_DOCKER_IMAGE() {
-    SSH_CMD="cd $SRC_DIRECTORY && /usr/bin/docker build -t scraping_infra -f compose/Dockerfile . && docker compose -f docker-compose.yml down && docker compose -f docker-compose.yml up -d $2"
+    SSH_CMD="cd $SRC_DIRECTORY && docker compose -f docker-compose.yml stop && docker build -t scraping_infra -f compose/Dockerfile ."
     ssh "$SSH_USER"@$1 "$SSH_CMD"
-    echo "Rebuilt Docker image and restarted container for service $2 successfully." 
+    echo "Rebuilt Docker image successfully at $1." 
 }
 
 function RESTART_CONTAINER() {
@@ -46,7 +46,7 @@ function UPDATE_CODE() {
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            REBUILD_DOCKER_IMAGE $host ""
+            REBUILD_DOCKER_IMAGE $host
             if ! [ $? -eq 0 ]; then
                 echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
                 exit 1
