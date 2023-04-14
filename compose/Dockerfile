@@ -1,5 +1,8 @@
 FROM python:3.9.6-bullseye
 
+ARG REQUIREMENTS
+ARG NEW_PACKAGES
+
 WORKDIR /app
 
 # Install required packages using apt-get
@@ -14,9 +17,18 @@ RUN apt-get update && apt-get install -y \
     make \
     --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements.txt and install requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+# Conditionally install new packages if any
+RUN if [ -n "$NEW_PACKAGES" ]; then \
+        pip install --no-cache-dir --upgrade $NEW_PACKAGES; \
+    fi
+
+# Update requirements.txt file
+RUN echo "$REQUIREMENTS" > updated_requirements.txt
 
 COPY . .
 
