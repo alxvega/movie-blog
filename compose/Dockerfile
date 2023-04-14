@@ -17,9 +17,9 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements.txt and install requirements
-COPY requirements.txt .
-RUN pip install --upgrade -r requirements.txt
+# Mount cache for pip packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade -r requirements.txt
 
 # Conditionally install new packages if any
 RUN if [ -n "$NEW_PACKAGES" ]; then \
