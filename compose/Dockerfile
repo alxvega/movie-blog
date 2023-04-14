@@ -1,6 +1,5 @@
 FROM python:3.9.6-bullseye
 
-ARG REQUIREMENTS
 ARG NEW_PACKAGES
 
 WORKDIR /app
@@ -10,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     bash \
     nano \
     libpq-dev \
-    python3-dev \ 
+    python3-dev \
     libffi-dev \
     gcc \
     musl-dev \
@@ -20,15 +19,12 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements.txt and install requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install --upgrade -r requirements.txt
 
 # Conditionally install new packages if any
 RUN if [ -n "$NEW_PACKAGES" ]; then \
         pip install --no-cache-dir --upgrade $NEW_PACKAGES; \
     fi
-
-# Update requirements.txt file
-RUN echo "$REQUIREMENTS" > updated_requirements.txt
 
 COPY . .
 

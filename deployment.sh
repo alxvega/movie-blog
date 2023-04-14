@@ -17,35 +17,14 @@ function PULL_REPO() {
 
 function REBUILD_DOCKER_IMAGE() {
     local host=$1
-    local requirements_match=$2
-    local new_packages=$3
-    local cache_flag="--cache-from scraping_infra:latest"
-
-    if [ "$requirements_match" -eq 1 ]; then
-        # Use cache for pip install
-        echo "Requirements match. Using cache for pip install."
-    else
-        # Ignore cache for pip install
-        echo "Requirements do not match. Ignoring cache for pip install."
-        cache_flag="--no-cache"
-    fi
-
-    # Conditionally install new packages if any
-    local pip_command="pip install --no-cache-dir --upgrade -r requirements.txt"
-    if [ -n "$new_packages" ]; then
-        pip_command="$pip_command $new_packages"
-    else
-        echo "No new packages to install."
-    fi
+    local new_packages=$2
 
     SSH_CMD="cd $SRC_DIRECTORY && \
              docker compose -f docker-compose.yml stop && \
-             docker build $cache_flag -t scraping_infra:latest -f compose/Dockerfile \
-             --build-arg REQUIREMENTS=\"$(cat requirements.txt)\" \
+             docker build -t scraping_infra:latest -f compose/Dockerfile \
              --build-arg NEW_PACKAGES=\"$new_packages\" \
              . && \
-             $pip_command && \
-             cp updated_requirements.txt /path/to/updated_requirements.txt"
+             docker compose -f docker-compose.yml up -d"
     ssh "$SSH_USER"@$host "$SSH_CMD"
     echo "Rebuilt Docker image successfully at $host." 
 }
@@ -80,7 +59,7 @@ with open("requirements.txt") as f:
     requirements = set(f.read().splitlines())
 installed_packages = subprocess.check_output(['pip', 'freeze']).decode().splitlines()
 missing_packages = sorted(list(requirements - set(installed_packages)))
-print("\n".join(missing_packages))
+print(" ".join(missing_packages))
 END
 )
         echo "Missing packages: $missing_packages"
@@ -89,7 +68,7 @@ END
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            REBUILD_DOCKER_IMAGE $host 0 "$missing_packages"
+            REBUILD_DOCKER_IMAGE $host "$missing_packages"
             if ! [ $? -eq 0 ]; then
                 echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
                 exit 1
