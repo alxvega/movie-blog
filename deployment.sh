@@ -46,17 +46,11 @@ function UPDATE_CODE() {
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            for conn in $CELERY_SERVICES; do
-                host_service=`echo $conn | cut -d "@" -f 1`
-                celery_service=`echo $conn | cut -d "@" -f 2`
-                if [ "$host_service" == "$host" ]; then
-                    REBUILD_DOCKER_IMAGE $host $celery_service
-                    if ! [ $? -eq 0 ]; then
-                        echo "Error: REBUILD_DOCKER_IMAGE failed for $celery_service at $host. Stopping pipeline"
-                        exit 1
-                    fi
-                fi
-            done
+            REBUILD_DOCKER_IMAGE $host ""
+            if ! [ $? -eq 0 ]; then
+                echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
+                exit 1
+            fi
         fi
     done
 }
