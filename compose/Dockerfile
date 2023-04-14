@@ -18,8 +18,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Mount cache for pip packages
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 
 # Conditionally install new packages if any
 RUN if [ -n "$NEW_PACKAGES" ]; then \
