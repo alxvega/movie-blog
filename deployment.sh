@@ -23,8 +23,7 @@ function REBUILD_DOCKER_IMAGE() {
              docker compose -f docker-compose.yml stop && \
              docker build -t scraping_infra:latest -f compose/Dockerfile \
              --build-arg NEW_PACKAGES=\"$new_packages\" \
-             . && \
-             docker compose -f docker-compose.yml up -d"
+             ."
     ssh "$SSH_USER"@$host "$SSH_CMD"
     echo "Rebuilt Docker image successfully at $host." 
 }
