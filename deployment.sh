@@ -40,34 +40,23 @@ function UPDATE_CODE() {
     # Compare local requirements.txt content with the one on a remote machine
     scp $SSH_USER@$host:$SRC_DIRECTORY/requirements.txt ./requirements_remote.txt
     DIFF_OUTPUT="$(diff ./requirements.txt ./requirements_remote.txt)"
-    rm ./requirements_remote.txt
 
     if [ -n "$DIFF_OUTPUT" ]; then
         echo "Requirements have been updated. Packages will be installed."
         PIP_FLAG=1
+        # Extract the new packages
+        new_packages=$(comm -13 <(sort ./requirements.txt) <(sort ./requirements_remote.txt))
+        echo "New packages: $new_packages"
     else
         echo "Requirements have not been touched. Skipping libraries update"
         PIP_FLAG=0
     fi
-
-    # Extract the missing packages
-    if [ "$PIP_FLAG" -eq 1 ]; then
-        missing_packages=$(python <<END
-import subprocess
-with open("requirements.txt") as f:
-    requirements = set(f.read().splitlines())
-installed_packages = subprocess.check_output(['pip', 'freeze']).decode().splitlines()
-missing_packages = sorted(list(requirements - set(installed_packages)))
-print(" ".join(missing_packages))
-END
-)
-        echo "Missing packages: $missing_packages"
-    fi
+    rm ./requirements_remote.txt
 
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            REBUILD_DOCKER_IMAGE $host "$missing_packages"
+            REBUILD_DOCKER_IMAGE $host 0 "$new_packages"
             if ! [ $? -eq 0 ]; then
                 echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
                 exit 1
