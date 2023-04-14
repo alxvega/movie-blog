@@ -45,7 +45,7 @@ function UPDATE_CODE() {
         echo "Requirements have been updated. Packages will be installed."
         PIP_FLAG=1
         # Extract the new packages
-        new_packages=$(comm -13 <(sort ./requirements.txt) <(sort ./requirements_remote.txt))
+        new_packages=$(comm -13 <(sort ./requirements.txt) <(sort ./requirements_remote.txt) | sed '/^\s*$/d')
         echo "New packages: $new_packages"
     else
         echo "Requirements have not been touched. Skipping libraries update"
