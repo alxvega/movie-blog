@@ -16,14 +16,13 @@ function PULL_REPO() {
 }
 
 function REBUILD_DOCKER_IMAGE() {
-    scp ./requirements.txt $SSH_USER@$1:$SRC_DIRECTORY/requirements.txt
-    SSH_CMD="cd $SRC_DIRECTORY && /usr/local/bin/docker build -t  scraping_infra -f compose/Dockerfile . && docker-compose -f docker-compose.yml down && docker-compose -f docker-compose.yml up -d"
+    SSH_CMD="cd $SRC_DIRECTORY && /usr/local/bin/docker build -t scraping_infra -f compose/Dockerfile . && docker compose -f docker-compose.yml down && docker compose -f docker-compose.yml up -d $2"
     ssh "$SSH_USER"@$1 "$SSH_CMD"
-    echo "Rebuilt Docker image and restarted container successfully." 
+    echo "Rebuilt Docker image and restarted container for service $2 successfully." 
 }
 
 function RESTART_CONTAINER() {
-    SSH_CMD="cd $SRC_DIRECTORY && docker-compose -f docker-compose.yml restart $2"
+    SSH_CMD="cd $SRC_DIRECTORY && docker compose -f docker-compose.yml restart $2"
     ssh "$SSH_USER"@"$1" "$SSH_CMD"
 }
 
@@ -46,11 +45,17 @@ function UPDATE_CODE() {
     for host in "${HOSTS[@]}"; do
         PULL_REPO $host 
         if [ "$PIP_FLAG" -eq 1 ]; then
-            REBUILD_DOCKER_IMAGE $host
-            if ! [ $? -eq 0 ]; then
-                echo "Error: REBUILD_DOCKER_IMAGE failed for $host. Stopping pipeline"
-                exit 1
-            fi
+            for conn in $CELERY_SERVICES; do
+                host_service=`echo $conn | cut -d "@" -f 1`
+                celery_service=`echo $conn | cut -d "@" -f 2`
+                if [ "$host_service" == "$host" ]; then
+                    REBUILD_DOCKER_IMAGE $host $celery_service
+                    if ! [ $? -eq 0 ]; then
+                        echo "Error: REBUILD_DOCKER_IMAGE failed for $celery_service at $host. Stopping pipeline"
+                        exit 1
+                    fi
+                fi
+            done
         fi
     done
 }
