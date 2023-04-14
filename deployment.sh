@@ -16,7 +16,7 @@ function PULL_REPO() {
 }
 
 function REBUILD_DOCKER_IMAGE() {
-    SSH_CMD="cd $SRC_DIRECTORY && /usr/local/bin/docker build -t scraping_infra -f compose/Dockerfile . && docker compose -f docker-compose.yml down && docker compose -f docker-compose.yml up -d $2"
+    SSH_CMD="cd $SRC_DIRECTORY && /usr/bin/docker build -t scraping_infra -f compose/Dockerfile . && docker compose -f docker-compose.yml down && docker compose -f docker-compose.yml up -d $2"
     ssh "$SSH_USER"@$1 "$SSH_CMD"
     echo "Rebuilt Docker image and restarted container for service $2 successfully." 
 }
