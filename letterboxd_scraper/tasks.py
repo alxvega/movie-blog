@@ -93,7 +93,7 @@ def scrape_movie_page(self, page):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
+    rate_limit=f'{350 // WORKERS}/m',
 )
 def scrape_movie_image(self, movie, **kwargs):
     response = ImageFetcher().request(movie[1])
@@ -106,7 +106,7 @@ def scrape_movie_image(self, movie, **kwargs):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
+    rate_limit=f'{350 // WORKERS}/m',
 )
 def scrape_reviews(self, movie, process, **kwargs):
     if process == "popular":
@@ -124,7 +124,7 @@ def scrape_reviews(self, movie, process, **kwargs):
     default_retry_delay=600,
     autoretry_for=(RequestError, StaleProxyError),
     retry_kwargs={"max_retries": 5},
-    rate_limit=f'{800 // WORKERS}/m',
+    rate_limit=f'{350 // WORKERS}/m',
 )
 def scrape_movie_stats(self, movie, **kwargs):
     response = StatsFetcher().request(movie)

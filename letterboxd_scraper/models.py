@@ -6,7 +6,7 @@ class MovieModel(models.Model):
     id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=255)
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    rating = models.DecimalField(max_digits=3, decimal_places=2, null=True, default=None)
     extraction_datetime = models.DateTimeField(default=timezone.now)
 
 
