@@ -43,7 +43,7 @@ def kickoff_initial_movies_data():
 def kickoff_scrape_stats():
     movies = retrieve_movie_slugs()
     for movie in movies:
-        step = scrape_movie_stats.s(movie_slug=movie[1], id=movie[0])
+        step = scrape_movie_stats.s(movie=movie)
         step.link(save_stats.s())
         step.apply_async()
 
@@ -52,7 +52,6 @@ def kickoff_scrape_stats():
 def kickoff_scrape_images():
     movies = retrieve_movie_slugs()
     for movie in movies:
-        step = scrape_movie_image.s(movie_slug=movie[1], id=movie[0])
         step = scrape_movie_image.s(movie=movie)  # Pass movie tuple (id, slug) instead of id
         step.link(save_images.s())
         step.apply_async()
@@ -128,7 +127,7 @@ def scrape_reviews(self, movie, process, **kwargs):
     rate_limit=f'170/m',
 )
 def scrape_movie_stats(self, movie, **kwargs):
-    response = StatsFetcher().request(movie)
+    response = StatsFetcher().request(movie[1])
     stats = StatsParser().parse(response, **kwargs)
     return stats
 

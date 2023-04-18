@@ -36,11 +36,7 @@ class ReviewsParser:
                 "review": normalize(extract_text(text)),
                 "rating": normalize(extract_text(rating)),
             }
-            review_item.update(kwargs)
-            review_item["movie_id"] = review_item["movie"][
-                0
-            ]  # Set movie_id to the id from the movie tuple (id, slug)
-            del review_item["movie"]  # Remove the movie tuple from the review_item dictionary
+            review_item.update({'movie_id': kwargs['movie'][0]})
             items.append(review_item)
         return items
 
@@ -79,8 +75,7 @@ class StatsParser:
             "likes": extract_number(likes),
             "added_to_playlist": extract_number(playlists_number),
         }
-        item.update(kwargs)
-        item["movie_id"] = item["movie"][0]  # Set movie_id to the id
+        item.update({'movie_id': kwargs['movie'][0]})
         return item
 
 
@@ -97,9 +92,5 @@ class ImageParser:
             "poster_url": image,
             "resized_poster": resized_image,
         }
-        item.update(kwargs)
-        item["movie_id"] = item["movie"][
-            0
-        ]  # Set movie_id to the id from the movie tuple (id, slug)
-        del item["movie"]  # Remove the movie tuple from the item dictionary
+        item.update({'movie_id': kwargs['movie'][0]})
         return item
