@@ -8,39 +8,31 @@ from letterboxd_scraper.models import (
 )
 
 
-class MovieSerializer(serializers.ModelSerializer):
+class MovieListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieModel
         fields = ('id', 'title', 'slug', 'rating')
 
 
 class PopularReviewSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()
-
     class Meta:
         model = PopularReviewModel
-        fields = ('id', 'movie', 'name', 'review', 'rating')
+        fields = ('id', 'name', 'review', 'rating', 'movie_id')
 
 
 class RecentReviewSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()
-
     class Meta:
         model = RecentReviewModel
-        fields = ('id', 'movie', 'name', 'review', 'rating')
+        fields = ('id', 'name', 'review', 'rating', 'movie_id')
 
 
 class StatsSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()
-
     class Meta:
         model = StatsModel
-        fields = ('movie', 'views', 'likes', 'added_to_playlist')
+        fields = ('views', 'likes', 'added_to_playlist', 'movie_id')
 
 
 class ImageSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()
-
     class Meta:
         model = ImageModel
-        fields = ('movie', 'release_year', 'poster_url', 'resized_poster')
+        fields = ('release_year', 'poster_url', 'resized_poster', 'movie_id')
