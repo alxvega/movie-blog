@@ -19,7 +19,7 @@ from .serializers import (
 
 
 class CommonPaginator(pagination.PageNumberPagination):
-    page_size = 100
+    page_size = 50
 
 
 class MovieViewSet(viewsets.ModelViewSet):
