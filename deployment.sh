@@ -1,6 +1,4 @@
 #!/bin/bash
-SSH_USER='alex'
-SRC_DIRECTORY='/home/alex/scraping-infra'
 source .env
 
 CURRENT_BRANCH="$1"
