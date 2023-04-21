@@ -48,7 +48,6 @@ def kickoff_scrape_stats():
         step.link(save_stats.s())
         step.apply_async()
 
-
 @shared_task
 def kickoff_scrape_images():
     movies = retrieve_movie_slugs()

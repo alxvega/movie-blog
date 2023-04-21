@@ -17,12 +17,12 @@ class ImageModel(models.Model):
     resized_poster = models.URLField(null=True, blank=True)
     extraction_datetime = models.DateTimeField(default=timezone.now)
 
-
+    
 class PopularReviewModel(models.Model):
     movie = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     review = models.TextField()
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    rating_stars = models.CharField(max_length=800, null=True)
     extraction_datetime = models.DateTimeField(default=timezone.now)
 
 
@@ -30,7 +30,7 @@ class RecentReviewModel(models.Model):
     movie = models.ForeignKey(MovieModel, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     review = models.TextField()
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
+    rating_stars = models.CharField(max_length=800, null=True)
     extraction_datetime = models.DateTimeField(default=timezone.now)
 
 
