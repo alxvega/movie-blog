@@ -32,7 +32,8 @@ WORKERS_RATE_LIMIT = 5
 @shared_task()
 def kickoff_initial_movies_data():
     fetcher = MoviesFetcher()
-    pagination = fetcher.get_pagination()
+    # pagination = fetcher.get_pagination()
+    pagination = 100
     for page in range(1, pagination + 1):
         step = scrape_movie_page.s(page)
         step.link(save_movies.s())
