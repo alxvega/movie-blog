@@ -75,7 +75,7 @@ class StatsParser:
             "likes": extract_number(likes),
             "added_to_playlist": extract_number(playlists_number),
         }
-        item.update(kwargs)
+        item.update({'movie_id': kwargs['movie'][0]})
         return item
 
 
@@ -92,5 +92,5 @@ class ImageParser:
             "poster_url": image,
             "resized_poster": resized_image,
         }
-        item.update(kwargs)
+        item.update({'movie_id': kwargs['movie'][0]})
         return item
