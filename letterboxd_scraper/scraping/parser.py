@@ -5,14 +5,14 @@ from selectolax.parser import HTMLParser
 def extract_text(selector):
     try:
         return selector.text()
-    except TypeError:
+    except AttributeError:
         return None
 
 
 def normalize(text):
     try:
         return re.sub(r"\s+", " ", text).strip()
-    except TypeError:
+    except AttributeError:
         return None
 
 
