@@ -5,7 +5,7 @@ from selectolax.parser import HTMLParser
 def extract_text(selector):
     try:
         return selector.text()
-    except AttributeError. TypeError:
+    except (TypeError, AttributeError):
         return None
 
 
