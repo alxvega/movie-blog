@@ -30,13 +30,13 @@ class ReviewsParser:
         for review in movie_grid:
             author = review.css_first('strong[class="name"]')
             text = review.css_first('div[class*="body-text"]')
-            rating_stars = review.css_first('span[class*="rating"]')
+            rating = review.css_first('span[class*="rating"]')
             review_item = {
                 "name": normalize(extract_text(author)),
                 "review": normalize(extract_text(text)),
-                "rating_stars": normalize(extract_text(rating_stars)),
+                "rating_stars": normalize(extract_text(rating)),
             }
-            review_item.update({'movie_id': kwargs['movie'][0]})
+            review_item.update(kwargs)
             items.append(review_item)
         return items
 
@@ -75,7 +75,7 @@ class StatsParser:
             "likes": extract_number(likes),
             "added_to_playlist": extract_number(playlists_number),
         }
-        item.update({'movie_id': kwargs['movie'][0]})
+        item.update(kwargs)
         return item
 
 
@@ -92,5 +92,5 @@ class ImageParser:
             "poster_url": image,
             "resized_poster": resized_image,
         }
-        item.update({'movie_id': kwargs['movie'][0]})
+        item.update(kwargs)
         return item
