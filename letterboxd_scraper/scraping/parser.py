@@ -30,11 +30,11 @@ class ReviewsParser:
         for review in movie_grid:
             author = review.css_first('strong[class="name"]')
             text = review.css_first('div[class*="body-text"]')
-            rating = review.css_first('span[class*="rating"]')
+            rating_stars = review.css_first('span[class*="rating"]')
             review_item = {
                 "name": normalize(extract_text(author)),
                 "review": normalize(extract_text(text)),
-                "rating": normalize(extract_text(rating)),
+                "rating": normalize(extract_text(rating_stars)),
             }
             review_item.update({'movie_id': kwargs['movie'][0]})
             items.append(review_item)
