@@ -34,7 +34,7 @@ class ReviewsParser:
             review_item = {
                 "name": normalize(extract_text(author)),
                 "review": normalize(extract_text(text)),
-                "rating": normalize(extract_text(rating_stars)),
+                "rating_stars": normalize(extract_text(rating_stars)),
             }
             review_item.update({'movie_id': kwargs['movie'][0]})
             items.append(review_item)
